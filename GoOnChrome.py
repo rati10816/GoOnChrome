@@ -1,7 +1,7 @@
 from selenium import webdriver 
 from selenium.webdriver.common.keys import Keys
 import time 
-import os 
+import os
 
 username = input("Enter your FB username: ")
 password = input("Enter your FB password: ")
@@ -14,6 +14,7 @@ dir_path = dir_path.replace('\\','/')
 browser = webdriver.Chrome(dir_path+"/Drivers/Chrome V99/chromedriver.exe")
 
 browser.get("https://www.facebook.com/")
+browser.maximize_window()
 
 # Log in In Facebook
 user = browser.find_element_by_id('email')
