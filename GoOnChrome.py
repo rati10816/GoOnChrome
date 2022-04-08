@@ -1,67 +1,73 @@
+from concurrent.futures import BrokenExecutor
 from selenium import webdriver 
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time 
 import os
 
 # getting user and password
 username = input("Enter your FB username: ")
 password = input("Enter your FB password: ")
-# Friend = input("Enter your frinds name: ")
-# Text = input("Enter text for your frined: ")
+Friend = input("Enter your frinds Full Name: ")
+Text = input("Enter text for your frined: ")
 
 # find version of current chrome 
-version = os.popen('reg query "HKLM\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome"')
-output = version.read()
+def getChromeVersion():
+    registryRecord = os.popen('reg query "HKLM\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome" /v Version')
+    registryRecordString = registryRecord.read()
+    registryRecordList = registryRecordString.split(" ")
+    chromeVersionFull = registryRecordList[-1]
+    chromeFullVersionList = chromeVersionFull.split(".")
+    chromeMajorVersion = chromeFullVersionList[0]
+    return chromeMajorVersion
+    
+def getBrowser(chromeVersion):
+    if (int(chromeVersion) > 100 or int(chromeVersion) < 95):
+        print("Sorry We don't support your chrome version... You can use Chrome version: 95, 96, 97, 98, 100")
+        os._exit(0)
 
-# get chrome drivers directory
-dir_path = os.path.dirname(os.path.realpath(__file__))
-dir_path = dir_path.replace('\\','/')
+    # get chrome drivers directory
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    dir_path = dir_path.replace('\\','/')
+    browser = webdriver.Chrome(dir_path + "/Drivers/Chrome V" + chromeVersion + "/chromedriver.exe")
+    return browser
+
 
 # Facebook Log in Function
-def facebook():
+def LogInTofacebook(browser):
     browser.get("https://www.facebook.com/")
     browser.maximize_window()
 
-    user = browser.find_element_by_id('email')
-    psswd = browser.find_element_by_id('pass')
-
-    time.sleep(0.5)
+    user = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.ID, "email")))
+    psswd = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.ID, "pass")))
     user.send_keys(username)
-    time.sleep(0.5)
     psswd.send_keys(password)
-    time.sleep(0.5)
     psswd.send_keys(Keys.ENTER)
 
-    # Search Friend
-    # time.sleep(15)
-    # search = browser.find_element_by_class_name("oajrlxb2 f1sip0of hidtqoto e70eycc3 hzawbc8m ijkhr0an pvl4gcvk sgqwj88q b1f16np4 hdh3q7d8 dwo3fsh8 g5ia77u1 qu0x051f esr5mh6w e9989ue4 r7d6kgcz br7hx15l h2jyy9rg n3ddgdk9 owxd89k7 rq0escxv oo9gr5id mg4g778l buofh1pr g5gj957u ihxqhq3m jq4qci2q hpfvmrgz lzcic4wl l9j0dhe7 iu8raji3 l60d2q6s dflh9lhu hwnh5xvq scb9dxdr qypqp5cg rmlgq0sb dzqu5etb aj8hi1zk kd8v7px7 r4fl40cc m07ooulj mzan44vs")
-    # search.send_keys(Friend)
-    # search.send_keys(Keys.ENTER)
+    # Search Friend Function
+def searchFriend(browser):
+    search = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[@type='search']")))
+    search.click()
+    search.send_keys(Friend)
+    search.send_keys(Keys.ENTER)
 
-# find chrome driver for this version and login to facebook
-if(output.find("100") != -1):
-    browser = webdriver.Chrome(dir_path+"/Drivers/Chrome V100/chromedriver.exe")
-    facebook()
+# Message Function
+def TextToFriend(browser, Text):
+    # get to friends profile
+    Person = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, "//a[@aria-label='Rati Kirkitadze']")))
+    Person.click()
 
-elif(output.find("99") != -1):
-    browser = webdriver.Chrome(dir_path+"/Drivers/Chrome V99/chromedriver.exe")
-    facebook()
+    # message friend
+    message = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, "//div[@aria-label='Message']")))
+    message.click()
+    sendbox = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, "//div[@aria-label='Message']")))
+    sendbox.click()
+    sendbox.send_keys(Text)
 
-elif(output.find("98") != -1):
-    browser = webdriver.Chrome(dir_path+"/Drivers/Chrome V98/chromedriver.exe")
-    facebook()
-
-elif(output.find("97") != -1):
-    browser = webdriver.Chrome(dir_path+"/Drivers/Chrome V97/chromedriver.exe")
-    facebook()
-
-elif(output.find("96") != -1):
-    browser = webdriver.Chrome(dir_path+"/Drivers/Chrome V96/chromedriver.exe")
-    facebook()
-
-elif(output.find("95") != -1):
-    browser = webdriver.Chrome(dir_path+"/Drivers/Chrome V95/chromedriver.exe")
-    facebook()
-
-else:
-    print("Sorry We don't support your chrome version... You can use Chrome version: 95, 96, 97, 98, 100")
+chromeVersion = getChromeVersion()
+browser = getBrowser(chromeVersion)
+LogInTofacebook(browser)
+searchFriend(browser)
+TextToFriend(browser, Text)
