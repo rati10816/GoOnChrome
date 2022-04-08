@@ -56,7 +56,7 @@ def searchFriend(browser):
 # Message Function
 def TextToFriend(browser, Text):
     # get to friends profile
-    Person = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.XPATH, "//a[@aria-label='Rati Kirkitadze']")))
+    Person = WebDriverWait(browser, 20).until(EC.element_to_be_clickable((By.LINK_TEXT, Friend)))
     Person.click()
 
     # message friend
