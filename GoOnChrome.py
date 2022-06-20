@@ -132,8 +132,8 @@ def getChromeVersion():
     return chromeMajorVersion
     
 def getBrowser(chromeVersion):
-    if (int(chromeVersion) > 101 or int(chromeVersion) < 95):
-        print("\nSorry We don't support your chrome version... You can use Chrome version: 95, 96, 97, 98, 99, 100 or 101")
+    if (int(chromeVersion) > 103 or int(chromeVersion) < 95):
+        print("\nSorry We don't support your chrome version... You can use Chrome version: 95, 96, 97, 98, 99, 101, 102 or 103")
         os._exit(0)
 
     # get chrome drivers directory
